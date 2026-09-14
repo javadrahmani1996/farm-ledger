@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#33472C">
+<title>دفتر کل مزرعه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3EFE0; --surface:#FFFFFF; --surface-alt:#EAE3CA;
+    --primary:#33472C; --primary-light:#5B7A45; --primary-pale:#DEE6D2;
+    --accent:#B8862E; --accent-pale:#F3E4C2;
+    --rust:#9C4A34; --rust-pale:#F1DDD3;
+    --text:#252A20; --text-muted:#767657; --border:#DED4B4;
+    --radius-s:10px; --radius-m:16px; --radius-l:22px;
+    --shadow:0 2px 10px rgba(37,42,32,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;}
+  #root{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:78px;}
+  .topbar{padding:20px 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .topbar .ttl{font-size:16px;font-weight:800;color:var(--primary);}
+  .topbar .sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .icon-btn{width:38px;height:38px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--primary);cursor:pointer;flex-shrink:0;}
+  .icon-btn svg{width:18px;height:18px;}
+  .back-row{display:flex;align-items:center;gap:10px;}
+  .view{padding:0 16px 20px;animation:fadeUp .25s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .section-title{font-size:14px;font-weight:700;color:var(--primary);margin:20px 2px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .section-title .link{font-size:12px;font-weight:500;color:var(--accent);cursor:pointer;}
+  .card{background:var(--surface);border-radius:var(--radius-m);padding:16px;box-shadow:var(--shadow);border:1px solid rgba(37,42,32,0.04);}
+  .empty{text-align:center;color:var(--text-muted);font-size:13px;padding:26px 10px;background:var(--surface);border-radius:var(--radius-m);border:1px dashed var(--border);}
+  .row-item{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:var(--radius-m);padding:12px 14px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;}
+  .row-badge{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .row-badge svg{width:18px;height:18px;}
+  .b-green{background:var(--primary-pale);color:var(--primary);}
+  .b-rust{background:var(--rust-pale);color:var(--rust);}
+  .b-gold{background:var(--accent-pale);color:var(--accent);}
+  .row-main{flex:1;min-width:0;}
+  .row-title{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .row-sub{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  .row-end{text-align:left;flex-shrink:0;}
+  .row-amount{font-size:13px;font-weight:800;}
+  .pos{color:var(--primary);} .neg{color:var(--rust);}
+  .row-date{font-size:10.5px;color:var(--text-muted);margin-top:2px;}
+  .date-group-lbl{font-size:11px;font-weight:700;color:var(--text-muted);margin:16px 2px 8px;}
+  .subtabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;}
+  .subtabs button{border:1px solid var(--border);background:var(--surface);color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap;cursor:pointer;}
+  .subtabs button.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .totals-bar{display:flex;justify-content:space-between;background:var(--primary);color:#fff;border-radius:var(--radius-m);padding:12px 14px;margin-bottom:14px;font-size:11.5px;gap:6px;}
+  .totals-bar b{display:block;font-size:13.5px;margin-top:2px;}
+  .stat-row{display:flex;gap:10px;}
+  .stat{flex:1;background:var(--surface);border-radius:var(--radius-m);padding:13px 11px;box-shadow:var(--shadow);}
+  .stat .lbl{font-size:11px;color:var(--text-muted);font-weight:500;}
+  .stat .val{font-size:15.5px;font-weight:800;margin-top:6px;}
+  .stat.income .val{color:var(--primary);} .stat.expense .val{color:var(--rust);} .stat.profit .val{color:var(--accent);}
+  .fab{position:fixed;left:50%;transform:translateX(190px);bottom:26px;width:54px;height:54px;border-radius:18px;background:var(--accent);box-shadow:0 6px 16px rgba(184,134,46,0.45);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;z-index:40;}
+  @media(max-width:480px){.fab{left:auto;right:18px;transform:none;}}
+  .fab svg{width:24px;height:24px;color:#fff;}
+  .overlay{position:fixed;inset:0;background:rgba(30,32,20,0.42);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .overlay.open{opacity:1;pointer-events:auto;}
+  .sheet{width:100%;max-width:480px;background:var(--bg);border-radius:22px 22px 0 0;padding:18px 18px 24px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .22s;}
+  .overlay.open .sheet{transform:translateY(0);}
+  .sheet-handle{width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 14px;}
+  .sheet-title{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:16px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;}
+  .field input,.field select,.field textarea{width:100%;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-s);padding:11px 12px;font-family:inherit;font-size:13.5px;color:var(--text);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .jalali-row{display:flex;gap:6px;}
+  .jalali-row select{flex:1;padding:11px 4px;font-size:12.5px;}
+  .seg{display:flex;gap:8px;}
+  .seg button{flex:1;padding:10px 0;border-radius:var(--radius-s);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text-muted);}
+  .seg button.on-a.active{background:var(--primary-pale);border-color:var(--primary);color:var(--primary);}
+  .seg button.on-b.active{background:var(--rust-pale);border-color:var(--rust);color:var(--rust);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .computed-total{background:var(--accent-pale);border-radius:var(--radius-s);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;font-size:13px;font-weight:700;color:var(--accent);}
+  .btn{width:100%;padding:13px 0;border-radius:var(--radius-s);border:none;background:var(--primary);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+  .btn.secondary{background:var(--surface);color:var(--rust);border:1px solid var(--rust-pale);}
+  .btn.ghost{background:var(--surface-alt);color:var(--text);}
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:999px;font-size:12.5px;font-weight:600;box-shadow:0 6px 16px rgba(0,0,0,0.2);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:30;}
+  .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;font-family:inherit;color:var(--text-muted);font-size:10px;font-weight:600;padding:4px 0;cursor:pointer;}
+  .navbtn svg{width:19px;height:19px;}
+  .navbtn.active{color:var(--primary);}
+  .land-card{background:var(--surface);border-radius:var(--radius-m);padding:16px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;}
+  .land-card .lname{font-size:15px;font-weight:800;color:var(--primary);}
+  .land-card .lstats{display:flex;gap:16px;margin-top:8px;}
+  .land-card .lstats div{font-size:11px;color:var(--text-muted);}
+  .land-card .lstats b{display:block;font-size:13px;color:var(--text);margin-top:2px;}
+  .signin-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;}
+  .signin-wrap .mark{width:70px;height:70px;border-radius:22px;background:var(--primary);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+  .signin-wrap .mark svg{width:36px;height:36px;color:var(--accent-pale);}
+  .signin-wrap h1{font-size:19px;color:var(--primary);margin:0 0 8px;}
+  .signin-wrap p{font-size:13px;color:var(--text-muted);margin:0 0 26px;line-height:1.9;}
+  .google-btn{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 22px;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;box-shadow:var(--shadow);}
+  .center-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;}
+  .rate-card{background:var(--surface-alt);border-radius:var(--radius-s);padding:12px;margin-bottom:14px;font-size:12px;color:var(--text-muted);}
+  .rate-card b{color:var(--text);}
+  .bar-row{margin-bottom:12px;}
+  .bar-row .bar-lbl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;}
+  .bar-track{height:9px;background:var(--surface-alt);border-radius:99px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--primary-light);border-radius:99px;}
+  .checkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:13px;}
+</style>
+</head>
+<body>
+<div id="root"><div class="center-loading">در حال بارگذاری...</div></div>
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+  getRedirectResult, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCDQ1jA3KDh8CoTxYI6AQ1vAz9atex4Sdc",
+  authDomain: "farm-ledger-7cfa7.firebaseapp.com",
+  projectId: "farm-ledger-7cfa7",
+  storageBucket: "farm-ledger-7cfa7.firebasestorage.app",
+  messagingSenderId: "275471194292",
+  appId: "1:275471194292:web:e90bd826dc9fca6c7b9fe1"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+const provider = new GoogleAuthProvider();
+let CURRENT_USER = null;
+
+/* ================= JALALI CALENDAR ================= */
+function jdiv(a,b){return ~~(a/b);}
+function jmod(a,b){return a-~~(a/b)*b;}
+function jalCal(jy){
+  const breaks=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+  const bl=breaks.length; let gy=jy+621, leapJ=-14, jp=breaks[0], jm,jump,leap,n,i;
+  for(i=1;i<bl;i+=1){ jm=breaks[i]; jump=jm-jp; if(jy<jm) break; leapJ=leapJ+jdiv(jump,33)*8+jdiv(jmod(jump,33),4); jp=jm; }
+  n=jy-jp;
+  leapJ=leapJ+jdiv(n,33)*8+jdiv(jmod(n,33)+3,4);
+  if(jmod(jump,33)===4 && jump-n===4) leapJ+=1;
+  const leapG=jdiv(gy,4)-jdiv((jdiv(gy,100)+1)*3,4)-150;
+  const march=20+leapJ-leapG;
+  if(jump-n<6) n=n-jump+jdiv(jump,33)*33;
+  leap=jmod(jmod(n+1,33)-1,4); if(leap===-1) leap=4;
+  return {leap,gy,march};
+}
+function g2d(gy,gm,gd){
+  let d=jdiv((gy+jdiv(gm-8,6)+100100)*1461,4)+jdiv(153*jmod(gm+9,12)+2,5)+gd-34840408;
+  d=d-jdiv(jdiv(gy+jdiv(gm-8,6)+100100,100)*3,4)+752;
+  return d;
+}
+function j2d(jy,jm,jd){ const r=jalCal(jy); return g2d(r.gy,3,r.march)+(jm-1)*31-jdiv(jm,7)*(jm-7)+jd-1; }
+function d2g(jdn){
+  let j=4*jdn+139361631;
+  j=j+jdiv(jdiv(4*jdn+183187720,146097)*3,4)*4-3908;
+  const i=jdiv(jmod(j,1461),4)*5+308;
+  const gd=jdiv(jmod(i,153),5)+1;
+  const gm=jmod(jdiv(i,153),12)+1;
+  const gy=jdiv(j,1461)-100100+jdiv(8-gm,6);
+  return [gy,gm,gd];
+}
+function d2j(jdn){
+  const gy=d2g(jdn)[0]; let jy=gy-621; const r=jalCal(jy); const jdn1f=g2d(gy,3,r.march);
+  let k=jdn-jdn1f, jm,jd;
+  if(k>=0){ if(k<=185){ jm=1+jdiv(k,31); jd=jmod(k,31)+1; return [jy,jm,jd]; } else k-=186; }
+  else { jy-=1; k+=179; if(r.leap===1) k+=1; }
+  jm=7+jdiv(k,30); jd=jmod(k,30)+1; return [jy,jm,jd];
+}
+function toJalaali(gy,gm,gd){ return d2j(g2d(gy,gm,gd)); }
+function toGregorian(jy,jm,jd){ return d2g(j2d(jy,jm,jd)); }
+function jIsLeap(jy){ return jalCal(jy).leap===0; }
+function jDaysInMonth(jy,jm){ if(jm<=6) return 31; if(jm<=11) return 30; return jIsLeap(jy)?30:29; }
+const J_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+
+function isoFromJalali(jy,jm,jd){
+  const [gy,gm,gd]=toGregorian(jy,jm,jd);
+  return gy.toString().padStart(4,'0')+'-'+String(gm).padStart(2,'0')+'-'+String(gd).padStart(2,'0');
+}
+function jalaliFromIso(iso){
+  const [gy,gm,gd]=iso.split('-').map(Number);
+  return toJalaali(gy,gm,gd);
+}
+function todayIso(){
+  const d=new Date();
+  return d.getFullYear().toString().padStart(4,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function faDateLabel(iso){
+  if(!iso) return '';
+  const [jy,jm,jd]=jalaliFromIso(iso);
+  return jd+' '+J_MONTHS[jm-1]+' '+jy;
+}
+function faDateShort(iso){
+  const [jy,jm,jd]=jalaliFromIso(iso);
+  return jd+' '+J_MONTHS[jm-1];
+}
+function currentJalaliYear(){ const t=todayIso(); return jalaliFromIso(t)[0]; }
+
+/* Jalali date-picker widget: renders 3 selects, id prefix given */
+function jalaliPickerHTML(prefix, iso){
+  const [jy,jm,jd]=jalaliFromIso(iso||todayIso());
+  const cy=currentJalaliYear();
+  let yearsOpt='';
+  for(let y=cy+1;y>=cy-6;y--) yearsOpt+=`<option value="${y}" ${y===jy?'selected':''}>${y}</option>`;
+  let monthsOpt='';
+  J_MONTHS.forEach((mn,idx)=>{ monthsOpt+=`<option value="${idx+1}" ${idx+1===jm?'selected':''}>${mn}</option>`; });
+  const dim=jDaysInMonth(jy,jm);
+  let daysOpt='';
+  for(let d=1;d<=dim;d++) daysOpt+=`<option value="${d}" ${d===jd?'selected':''}>${d}</option>`;
+  return `<div class="jalali-row">
+    <select id="${prefix}_y" onchange="refreshJalaliDays('${prefix}')">${yearsOpt}</select>
+    <select id="${prefix}_m" onchange="refreshJalaliDays('${prefix}')">${monthsOpt}</select>
+    <select id="${prefix}_d">${daysOpt}</select>
+  </div>`;
+}
+window.refreshJalaliDays=function(prefix){
+  const y=parseInt(document.getElementById(prefix+'_y').value);
+  const m=parseInt(document.getElementById(prefix+'_m').value);
+  const daySel=document.getElementById(prefix+'_d');
+  const cur=parseInt(daySel.value)||1;
+  const dim=jDaysInMonth(y,m);
+  let opts='';
+  for(let d=1;d<=dim;d++) opts+=`<option value="${d}" ${d===Math.min(cur,dim)?'selected':''}>${d}</option>`;
+  daySel.innerHTML=opts;
+};
+function readJalaliPicker(prefix){
+  const y=parseInt(document.getElementById(prefix+'_y').value);
+  const m=parseInt(document.getElementById(prefix+'_m').value);
+  const d=parseInt(document.getElementById(prefix+'_d').value);
+  return isoFromJalali(y,m,d);
+}
+
+/* ================= HELPERS ================= */
+function fmt(n){ n=Math.round(Number(n)||0); return n.toLocaleString('en-US'); }
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function escapeAttr(s){ return String(s==null?'':s).replace(/"/g,'&quot;'); }
+
+/* ================= ICONS ================= */
+const ICONS = {
+  wheat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21V9"/><path d="M12 9c-2 0-3.5-1.3-3.5-3.5S10 2 12 5c0-3 1.5-3.5 3.5-3.5S17 4 15 6"/><path d="M12 13c-1.7 0-3-1.2-3-3s1.3-2.8 3-1c0-1.8 1.3-2.8 3-2.8S17.7 7.2 16 9"/></svg>',
+  land:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V10l7-6 7 6v10"/><path d="M9 20v-6h6v6"/></svg>',
+  exchange:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>',
+  workers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="9" r="2.3"/><path d="M15.8 14.6c2.4.2 4.2 2.1 4.2 5"/></svg>',
+  sell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4Z"/><path d="M3.5 8v8L12 20l8.5-4V8"/></svg>',
+  ops:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>',
+  audit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M11 20V4"/><path d="M18 20v-7"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+  google:'<svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.4 0-13.8 4.1-17.1 10.1z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.3-2.1 14-5.5l-6.5-5.4C29.4 34.9 26.8 36 24 36c-5.2 0-9.6-3.4-11.2-8.1l-6.6 5.1C9.9 39.6 16.4 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4 5.6l6.5 5.4C39.8 37 44 31.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>',
+};
+
+/* ================= FIRESTORE PATHS ================= */
+function uid(){ return CURRENT_USER.uid; }
+function landsCol(){ return collection(db,'users',uid(),'lands'); }
+function subCol(landId, name){ return collection(db,'users',uid(),'lands',landId,name); }
+function entriesCol(landId, parentCol, parentId){ return collection(db,'users',uid(),'lands',landId,parentCol,parentId,'entries'); }
+function logsCol(landId, parentCol, parentId){ return collection(db,'users',uid(),'lands',landId,parentCol,parentId,'logs'); }
+
+async function listDocs(colRef){
+  const snap = await getDocs(colRef);
+  const out=[]; snap.forEach(d=>out.push({id:d.id,...d.data()}));
+  return out;
+}
+async function addD(colRef, data){ return await addDoc(colRef, {...data, createdAt: Date.now()}); }
+async function updD(colRef, id, data){ return await updateDoc(doc(colRef,id), data); }
+async function delD(colRef, id){ return await deleteDoc(doc(colRef,id)); }
+
+/* ================= APP STATE ================= */
+let NAV = {screen:'lands'};
+let CACHE = { lands:[], vendors:{}, vendorEntries:{}, buyers:{}, buyerEntries:{}, workers:{}, workerLogs:{}, foremen:{}, foremanLogs:{}, operations:{} };
+let workerTab = 'individual';
+let dashPeriodGlobal = 'all';
+
+async function preloadForScreen(nav){
+  switch(nav.screen){
+    case 'lands': await refreshLands(); break;
+    case 'vendors': {
+      await refreshVendors(nav.landId);
+      await Promise.all((CACHE.vendors[nav.landId]||[]).map(v=>refreshVendorEntries(nav.landId, v.id)));
+      break;
+    }
+    case 'buyers': {
+      await refreshBuyers(nav.landId);
+      await Promise.all((CACHE.buyers[nav.landId]||[]).map(b=>refreshBuyerEntries(nav.landId, b.id)));
+      break;
+    }
+    case 'workers': {
+      await Promise.all([refreshWorkers(nav.landId), refreshForemen(nav.landId)]);
+      await Promise.all([
+        ...((CACHE.workers[nav.landId]||[]).map(w=>refreshWorkerLogs(nav.landId, w.id))),
+        ...((CACHE.foremen[nav.landId]||[]).map(f=>refreshForemanLogs(nav.landId, f.id))),
+      ]);
+      break;
+    }
+    case 'operations': await refreshOperations(nav.landId); break;
+    case 'vendorDetail': await refreshVendorEntries(nav.landId, nav.vendorId); break;
+    case 'buyerDetail': await refreshBuyerEntries(nav.landId, nav.buyerId); break;
+    case 'workerDetail': await refreshWorkerLogs(nav.landId, nav.workerId); break;
+    case 'foremanDetail': await refreshForemanLogs(nav.landId, nav.foremanId); break;
+    case 'landAudit': delete LAND_AUDIT_CACHE[nav.landId]; break;
+    case 'globalAudit': GLOBAL_AUDIT_CACHE=null; break;
+  }
+}
+async function go(nav){
+  NAV = nav;
+  document.getElementById('root').innerHTML = topbarHTML() + '<div class="view"><div class="center-loading" style="min-height:200px">در حال بارگذاری...</div></div>' + landBottomNavHTML();
+  await preloadForScreen(nav);
+  render();
+  window.scrollTo(0,0);
+}
+
+/* ================= AUTH ================= */
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    CURRENT_USER = user;
+    await refreshLands();
+    go({screen:'lands'});
+  } else {
+    CURRENT_USER = null;
+    renderSignIn();
+  }
+});
+window.doSignIn = async function(){
+  try{
+    await signInWithPopup(auth, provider);
+  }catch(e){
+    toast('ورود انجام نشد: '+(e.code||e.message));
+  }
+};
+window.doSignOut = async function(){ await signOut(auth); };
+
+function renderSignIn(){
+  document.getElementById('root').innerHTML = `
+  <div class="signin-wrap">
+    <div class="mark">${ICONS.wheat}</div>
+    <h1>دفتر کل مزرعه</h1>
+    <p>با حساب گوگل خودتون وارد بشید تا اطلاعات‌تون همیشه امن و خودکار ذخیره بشه — روی هر گوشی که با همین حساب وارد بشید، همه‌چی برمی‌گرده.</p>
+    <button class="google-btn" onclick="doSignIn()">${ICONS.google} ورود با حساب گوگل</button>
+  </div>`;
+}
+
+/* ================= DATA REFRESH ================= */
+async function refreshLands(){ CACHE.lands = await listDocs(landsCol()); }
+async function refreshVendors(landId){ CACHE.vendors[landId] = await listDocs(subCol(landId,'vendors')); }
+async function refreshVendorEntries(landId, vendorId){ CACHE.vendorEntries[vendorId] = await listDocs(entriesCol(landId,'vendors',vendorId)); }
+async function refreshBuyers(landId){ CACHE.buyers[landId] = await listDocs(subCol(landId,'buyers')); }
+async function refreshBuyerEntries(landId, buyerId){ CACHE.buyerEntries[buyerId] = await listDocs(entriesCol(landId,'buyers',buyerId)); }
+async function refreshWorkers(landId){ CACHE.workers[landId] = await listDocs(subCol(landId,'workers')); }
+async function refreshWorkerLogs(landId, workerId){ CACHE.workerLogs[workerId] = await listDocs(logsCol(landId,'workers',workerId)); }
+async function refreshForemen(landId){ CACHE.foremen[landId] = await listDocs(subCol(landId,'foremen')); }
+async function refreshForemanLogs(landId, foremanId){ CACHE.foremanLogs[foremanId] = await listDocs(logsCol(landId,'foremen',foremanId)); }
+async function refreshOperations(landId){ CACHE.operations[landId] = await listDocs(subCol(landId,'operations')); }
+
+/* ================= BALANCE CALC ================= */
+function vendorBalance(entries){
+  let bal=0; (entries||[]).forEach(e=>{ bal += e.type==='purchase' ? (e.amount||0) : -(e.amount||0); });
+  return bal;
+}
+function buyerBalance(entries){
+  let bal=0; (entries||[]).forEach(e=>{ bal += e.type==='sale' ? (e.total||0) : -(e.amount||0); });
+  return bal;
+}
+function workerWageSum(logs){ return (logs||[]).reduce((s,l)=>s+(l.wage||0),0); }
+
+/* ================= RENDER ROOT ================= */
+function render(){
+  const root=document.getElementById('root');
+  root.innerHTML = topbarHTML() + '<div class="view">' + screenHTML() + '</div>' + fabHTML() + landBottomNavHTML();
+}
+function fmtRial(n){ return fmt(n)+' ریال'; }
+
+function topbarHTML(){
+  const s=NAV.screen;
+  if(s==='lands' || s==='globalAudit'){
+    return `<div class="topbar">
+      <div><div class="ttl">دفتر کل مزرعه</div><div class="sub">${escapeHtml(CURRENT_USER.displayName||CURRENT_USER.email||'')}</div></div>
+      <div class="icon-btn" onclick="doSignOut()">${ICONS.logout}</div>
+    </div>`;
+  }
+  const land = CACHE.lands.find(l=>l.id===NAV.landId);
+  const landName = land? land.name : '';
+  let title='', back=null;
+  if(s==='landHome') { title=landName; back={screen:'lands'}; }
+  else if(['vendors','buyers','workers','operations','landAudit'].includes(s)) { title=landName; back={screen:'landHome',landId:NAV.landId}; }
+  else if(s==='vendorDetail') { title=(CACHE.vendors[NAV.landId]||[]).find(v=>v.id===NAV.vendorId)?.name||''; back={screen:'vendors',landId:NAV.landId}; }
+  else if(s==='buyerDetail') { title=(CACHE.buyers[NAV.landId]||[]).find(b=>b.id===NAV.buyerId)?.name||''; back={screen:'buyers',landId:NAV.landId}; }
+  else if(s==='workerDetail') { title=(CACHE.workers[NAV.landId]||[]).find(w=>w.id===NAV.workerId)?.name||''; back={screen:'workers',landId:NAV.landId}; }
+  else if(s==='foremanDetail') { title=(CACHE.foremen[NAV.landId]||[]).find(f=>f.id===NAV.foremanId)?.name||''; back={screen:'workers',landId:NAV.landId}; }
+  return `<div class="topbar">
+    <div class="back-row"><div class="icon-btn" onclick='go(${JSON.stringify(back)})'>${ICONS.back}</div><div class="ttl">${escapeHtml(title)}</div></div>
+  </div>`;
+}
+
+function landBottomNavHTML(){
+  if(!['landHome','vendors','buyers','workers','operations','landAudit'].includes(NAV.screen)) return '';
+  const landId=NAV.landId;
+  const items=[
+    ['landHome',ICONS.land,'زمین'],
+    ['vendors',ICONS.exchange,'هزینه'],
+    ['workers',ICONS.workers,'کارگر'],
+    ['buyers',ICONS.sell,'فروش'],
+    ['operations',ICONS.ops,'عملیات'],
+    ['landAudit',ICONS.audit,'حسابرسی'],
+  ];
+  return '<div class="bottomnav">'+items.map(([id,icon,lbl])=>`
+    <button class="navbtn ${NAV.screen===id?'active':''}" onclick='go({screen:"${id}",landId:"${landId}"})'>${icon}<span>${lbl}</span></button>
+  `).join('')+'</div>';
+}
+
+function fabHTML(){
+  const s=NAV.screen;
+  let action=null;
+  if(s==='lands') action="openLandSheet()";
+  else if(s==='vendors') action="openVendorSheet('"+NAV.landId+"')";
+  else if(s==='vendorDetail') action=`openVendorEntrySheet('${NAV.landId}','${NAV.vendorId}')`;
+  else if(s==='buyers') action="openBuyerSheet('"+NAV.landId+"')";
+  else if(s==='buyerDetail') action=`openBuyerEntrySheet('${NAV.landId}','${NAV.buyerId}')`;
+  else if(s==='workers') action = workerTab==='individual' ? `openWorkerSheet('${NAV.landId}')` : `openForemanSheet('${NAV.landId}')`;
+  else if(s==='workerDetail') action=`openWorkerLogSheet('${NAV.landId}','${NAV.workerId}')`;
+  else if(s==='foremanDetail') action=`openForemanLogSheet('${NAV.landId}','${NAV.foremanId}')`;
+  else if(s==='operations') action=`openOperationSheet('${NAV.landId}')`;
+  if(!action) return '';
+  return `<button class="fab" onclick="${action}">${ICONS.plus}</button>`;
+}
+
+function emptyHTML(msg){ return `<div class="empty">${msg}</div>`; }
+
+/* ================= SCREEN ROUTER ================= */
+function screenHTML(){
+  switch(NAV.screen){
+    case 'lands': return landsScreen();
+    case 'globalAudit': return globalAuditScreen();
+    case 'landHome': return landHomeScreen();
+    case 'vendors': return vendorsScreen();
+    case 'vendorDetail': return vendorDetailScreen();
+    case 'buyers': return buyersScreen();
+    case 'buyerDetail': return buyerDetailScreen();
+    case 'workers': return workersScreen();
+    case 'workerDetail': return workerDetailScreen();
+    case 'foremanDetail': return foremanDetailScreen();
+    case 'operations': return operationsScreen();
+    case 'landAudit': return landAuditScreen();
+    default: return '';
+  }
+}
+
+/* ================= LANDS ================= */
+function landsScreen(){
+  return `
+    <div class="section-title">زمین‌های شما <span class="link" onclick="go({screen:'globalAudit'})">حسابرسی کل همه زمین‌ها</span></div>
+    ${CACHE.lands.length? CACHE.lands.map(landCardHTML).join('') : emptyHTML('هنوز زمینی اضافه نکردید — با دکمه + یکی اضافه کنید')}
+  `;
+}
+function landCardHTML(l){
+  return `<div class="land-card" onclick='go({screen:"landHome",landId:"${l.id}"})'>
+    <div class="lname">${escapeHtml(l.name)}</div>
+  </div>`;
+}
+window.openLandSheet=function(editId){
+  const editing = editId ? CACHE.lands.find(l=>l.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش زمین':'زمین جدید'}</div>
+    <div class="field"><label>نام زمین</label><input type="text" id="landName" value="${editing?escapeAttr(editing.name):''}" placeholder="مثلاً زمین شمالی"></div>
+    <button class="btn" onclick="saveLand('${editing?editing.id:''}')">${editing?'ذخیره':'افزودن'}</button>
+  `);
+};
+window.saveLand=async function(editId){
+  const name=document.getElementById('landName').value.trim();
+  if(!name){ toast('نام زمین را وارد کنید'); return; }
+  if(editId){ await updD(landsCol(),editId,{name}); }
+  else{ await addD(landsCol(),{name}); }
+  await refreshLands(); closeSheet(); go({screen:'lands'}); toast('ذخیره شد');
+};
+
+/* ================= LAND HOME ================= */
+function landHomeScreen(){
+  return `
+    <div class="section-title">دسترسی سریع</div>
+    <div class="row-item" onclick='go({screen:"vendors",landId:"${NAV.landId}"})'><div class="row-badge b-rust">${ICONS.exchange}</div><div class="row-main"><div class="row-title">هزینه (خرید از فروشنده‌ها)</div></div></div>
+    <div class="row-item" onclick='go({screen:"workers",landId:"${NAV.landId}"})'><div class="row-badge b-gold">${ICONS.workers}</div><div class="row-main"><div class="row-title">کارگر و دستمزد</div></div></div>
+    <div class="row-item" onclick='go({screen:"buyers",landId:"${NAV.landId}"})'><div class="row-badge b-green">${ICONS.sell}</div><div class="row-main"><div class="row-title">فروش</div></div></div>
+    <div class="row-item" onclick='go({screen:"operations",landId:"${NAV.landId}"})'><div class="row-badge b-gold">${ICONS.ops}</div><div class="row-main"><div class="row-title">عملیات انجام‌شده</div></div></div>
+    <div class="row-item" onclick='go({screen:"landAudit",landId:"${NAV.landId}"})'><div class="row-badge b-green">${ICONS.audit}</div><div class="row-main"><div class="row-title">حسابرسی کل این زمین</div></div></div>
+  `;
+}
+
+/* ================= VENDORS (هزینه) ================= */
+function vendorsScreen(){
+  const list = CACHE.vendors[NAV.landId]||[];
+  return list.length? list.map(v=>{
+    const entries = CACHE.vendorEntries[v.id];
+    const bal = entries!==undefined ? vendorBalance(entries) : null;
+    return `<div class="row-item" onclick="openVendorDetail('${NAV.landId}','${v.id}')">
+      <div class="row-badge b-rust">${ICONS.exchange}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(v.name)}</div></div>
+      <div class="row-end"><div class="row-amount ${bal>0?'neg':'pos'}">${bal===null?'...':fmt(bal)}</div><div class="row-date">مانده (ریال)</div></div>
+    </div>`;
+  }).join('') : emptyHTML('فروشنده‌ای ثبت نشده — با + اضافه کنید');
+}
+window.openVendorDetail=function(landId,vendorId){ go({screen:'vendorDetail',landId,vendorId}); };
+window.openVendorSheet=function(landId,editId){
+  const editing = editId ? (CACHE.vendors[landId]||[]).find(v=>v.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش فروشنده':'فروشنده جدید'}</div>
+    <div class="field"><label>نام فروشنده / مغازه</label><input type="text" id="vName" value="${editing?escapeAttr(editing.name):''}" placeholder="مثلاً کود فروشی حسینی"></div>
+    <button class="btn" onclick="saveVendor('${landId}','${editing?editing.id:''}')">${editing?'ذخیره':'افزودن'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteVendor('${landId}','${editing.id}')">حذف فروشنده</button>`:''}
+  `);
+};
+window.saveVendor=async function(landId,editId){
+  const name=document.getElementById('vName').value.trim();
+  if(!name){ toast('نام را وارد کنید'); return; }
+  if(editId) await updD(subCol(landId,'vendors'),editId,{name});
+  else await addD(subCol(landId,'vendors'),{name});
+  await refreshVendors(landId); closeSheet(); go({screen:'vendors',landId}); toast('ذخیره شد');
+};
+window.deleteVendor=async function(landId,id){
+  await delD(subCol(landId,'vendors'),id);
+  await refreshVendors(landId); closeSheet(); go({screen:'vendors',landId}); toast('حذف شد');
+};
+
+function vendorDetailScreen(){
+  const entries=(CACHE.vendorEntries[NAV.vendorId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const bal=vendorBalance(entries);
+  const v=(CACHE.vendors[NAV.landId]||[]).find(x=>x.id===NAV.vendorId);
+  return `
+    <div class="totals-bar"><div>مانده حساب<b>${fmt(bal)} ریال</b></div><div style="cursor:pointer" onclick="openVendorSheet('${NAV.landId}','${NAV.vendorId}')">ویرایش نام</div></div>
+    ${entries.length? entries.map(e=>vendorEntryRow(e)).join('') : emptyHTML('هنوز رکوردی ثبت نشده')}
+  `;
+}
+function vendorEntryRow(e){
+  const isPur=e.type==='purchase';
+  return `<div class="row-item" onclick="openVendorEntrySheet('${NAV.landId}','${NAV.vendorId}','${e.id}')">
+    <div class="row-badge ${isPur?'b-rust':'b-green'}">${isPur?ICONS.exchange:ICONS.sell}</div>
+    <div class="row-main"><div class="row-title">${isPur?escapeHtml(e.desc||'خرید'):'پرداخت'}</div><div class="row-sub">${e.note?escapeHtml(e.note):''}</div></div>
+    <div class="row-end"><div class="row-amount ${isPur?'neg':'pos'}">${isPur?'+':'-'}${fmt(isPur?e.amount:e.amount)}</div><div class="row-date">${faDateShort(e.date)}</div></div>
+  </div>`;
+}
+window.openVendorEntrySheet=function(landId,vendorId,editId){
+  const list=CACHE.vendorEntries[vendorId]||[];
+  const editing = editId ? list.find(e=>e.id===editId) : null;
+  const type = editing? editing.type : 'purchase';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش رکورد':'رکورد جدید'}</div>
+    <div class="seg" id="veTypeSeg">
+      <button type="button" class="on-a ${type==='purchase'?'active':''}" onclick="setVeType('purchase')">خرید جدید</button>
+      <button type="button" class="on-b ${type==='payment'?'active':''}" onclick="setVeType('payment')">پرداخت</button>
+    </div>
+    <input type="hidden" id="veType" value="${type}">
+    <div class="field" style="margin-top:13px;"><label>تاریخ</label>${jalaliPickerHTML('veDate', editing?editing.date:todayIso())}</div>
+    <div class="field" id="veDescWrap" style="display:${type==='purchase'?'block':'none'}"><label>شرح خرید</label><input type="text" id="veDesc" value="${editing?escapeAttr(editing.desc||''):''}" placeholder="مثلاً کود اوره ۵۰ کیسه"></div>
+    <div class="field"><label>مبلغ (ریال)</label><input type="number" id="veAmount" inputmode="numeric" value="${editing?editing.amount:''}" placeholder="0"></div>
+    <div class="field"><label>توضیحات (اختیاری)</label><textarea id="veNote">${editing?escapeHtml(editing.note||''):''}</textarea></div>
+    <button class="btn" onclick="saveVendorEntry('${landId}','${vendorId}','${editing?editing.id:''}')">${editing?'ذخیره':'ثبت'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteVendorEntry('${landId}','${vendorId}','${editing.id}')">حذف</button>`:''}
+  `);
+};
+window.setVeType=function(t){
+  document.getElementById('veType').value=t;
+  document.querySelectorAll('#veTypeSeg button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('#veTypeSeg .'+(t==='purchase'?'on-a':'on-b')).classList.add('active');
+  document.getElementById('veDescWrap').style.display = t==='purchase'?'block':'none';
+};
+window.saveVendorEntry=async function(landId,vendorId,editId){
+  const type=document.getElementById('veType').value;
+  const date=readJalaliPicker('veDate');
+  const desc=document.getElementById('veDesc').value.trim();
+  const amount=parseFloat(document.getElementById('veAmount').value)||0;
+  const note=document.getElementById('veNote').value.trim();
+  const data={type,date,desc,amount,note};
+  if(editId) await updD(entriesCol(landId,'vendors',vendorId),editId,data);
+  else await addD(entriesCol(landId,'vendors',vendorId),data);
+  await refreshVendorEntries(landId,vendorId); closeSheet(); go({screen:'vendorDetail',landId,vendorId}); toast('ذخیره شد');
+};
+window.deleteVendorEntry=async function(landId,vendorId,id){
+  await delD(entriesCol(landId,'vendors',vendorId),id);
+  await refreshVendorEntries(landId,vendorId); closeSheet(); go({screen:'vendorDetail',landId,vendorId}); toast('حذف شد');
+};
+
+/* ================= BUYERS (فروش) ================= */
+function buyersScreen(){
+  const list = CACHE.buyers[NAV.landId]||[];
+  return list.length? list.map(b=>{
+    const entries = CACHE.buyerEntries[b.id];
+    const bal = entries!==undefined? buyerBalance(entries) : null;
+    return `<div class="row-item" onclick="openBuyerDetail('${NAV.landId}','${b.id}')">
+      <div class="row-badge b-green">${ICONS.sell}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(b.name)}</div></div>
+      <div class="row-end"><div class="row-amount ${bal>0?'neg':'pos'}">${bal===null?'...':fmt(bal)}</div><div class="row-date">مانده (ریال)</div></div>
+    </div>`;
+  }).join('') : emptyHTML('خریداری ثبت نشده — با + اضافه کنید');
+}
+window.openBuyerDetail=function(landId,buyerId){ go({screen:'buyerDetail',landId,buyerId}); };
+window.openBuyerSheet=function(landId,editId){
+  const editing = editId ? (CACHE.buyers[landId]||[]).find(b=>b.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش خریدار':'خریدار جدید'}</div>
+    <div class="field"><label>نام خریدار</label><input type="text" id="bName" value="${editing?escapeAttr(editing.name):''}"></div>
+    <button class="btn" onclick="saveBuyer('${landId}','${editing?editing.id:''}')">${editing?'ذخیره':'افزودن'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteBuyer('${landId}','${editing.id}')">حذف</button>`:''}
+  `);
+};
+window.saveBuyer=async function(landId,editId){
+  const name=document.getElementById('bName').value.trim();
+  if(!name){ toast('نام را وارد کنید'); return; }
+  if(editId) await updD(subCol(landId,'buyers'),editId,{name});
+  else await addD(subCol(landId,'buyers'),{name});
+  await refreshBuyers(landId); closeSheet(); go({screen:'buyers',landId}); toast('ذخیره شد');
+};
+window.deleteBuyer=async function(landId,id){
+  await delD(subCol(landId,'buyers'),id);
+  await refreshBuyers(landId); closeSheet(); go({screen:'buyers',landId}); toast('حذف شد');
+};
+
+function buyerDetailScreen(){
+  const entries=(CACHE.buyerEntries[NAV.buyerId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const bal=buyerBalance(entries);
+  return `
+    <div class="totals-bar"><div>مانده حساب (طلب از خریدار)<b>${fmt(bal)} ریال</b></div><div style="cursor:pointer" onclick="openBuyerSheet('${NAV.landId}','${NAV.buyerId}')">ویرایش نام</div></div>
+    ${entries.length? entries.map(e=>buyerEntryRow(e)).join('') : emptyHTML('هنوز رکوردی ثبت نشده')}
+  `;
+}
+function buyerEntryRow(e){
+  const isSale=e.type==='sale';
+  return `<div class="row-item" onclick="openBuyerEntrySheet('${NAV.landId}','${NAV.buyerId}','${e.id}')">
+    <div class="row-badge ${isSale?'b-green':'b-gold'}">${ICONS.sell}</div>
+    <div class="row-main"><div class="row-title">${isSale?escapeHtml(e.cargoType||'بار'):'پرداخت / پیش‌پرداخت'}</div>
+      <div class="row-sub">${isSale? (fmt(e.qty)+' عدد · '+fmt(e.weight)+' کیلوگرم · فی '+fmt(e.unitPrice)) : (e.note?escapeHtml(e.note):'')}</div></div>
+    <div class="row-end"><div class="row-amount ${isSale?'pos':'neg'}">${isSale?'+':'-'}${fmt(isSale?e.total:e.amount)}</div><div class="row-date">${faDateShort(e.date)}</div></div>
+  </div>`;
+}
+window.openBuyerEntrySheet=function(landId,buyerId,editId){
+  const list=CACHE.buyerEntries[buyerId]||[];
+  const editing = editId ? list.find(e=>e.id===editId) : null;
+  const type = editing? editing.type : 'sale';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش رکورد':'رکورد جدید'}</div>
+    <div class="seg" id="beTypeSeg">
+      <button type="button" class="on-a ${type==='sale'?'active':''}" onclick="setBeType('sale')">بار جدید (فروش)</button>
+      <button type="button" class="on-b ${type==='payment'?'active':''}" onclick="setBeType('payment')">پرداخت / پیش‌پرداخت</button>
+    </div>
+    <input type="hidden" id="beType" value="${type}">
+    <div class="field" style="margin-top:13px;"><label>تاریخ</label>${jalaliPickerHTML('beDate', editing?editing.date:todayIso())}</div>
+    <div id="beSaleFields" style="display:${type==='sale'?'block':'none'}">
+      <div class="field"><label>نوع بار</label><input type="text" id="beCargo" value="${editing?escapeAttr(editing.cargoType||''):''}" placeholder="مثلاً گندم"></div>
+      <div class="grid2">
+        <div class="field"><label>تعداد</label><input type="number" id="beQty" value="${editing?editing.qty:''}" oninput="updateBeTotal()"></div>
+        <div class="field"><label>وزن (کیلوگرم)</label><input type="number" id="beWeight" value="${editing?editing.weight:''}" oninput="updateBeTotal()"></div>
+      </div>
+      <div class="field"><label>فی (ریال به ازای هر کیلوگرم)</label><input type="number" id="beUnitPrice" value="${editing?editing.unitPrice:''}" oninput="updateBeTotal()"></div>
+      <div class="computed-total"><span>جمع کل</span><span id="beTotalDisplay">${editing?fmt(editing.total):'0'} ریال</span></div>
+    </div>
+    <div id="bePayFields" style="display:${type==='payment'?'block':'none'}">
+      <div class="field"><label>مبلغ (ریال)</label><input type="number" id="beAmount" value="${editing&&editing.type==='payment'?editing.amount:''}"></div>
+    </div>
+    <div class="field"><label>توضیحات (اختیاری)</label><textarea id="beNote">${editing?escapeHtml(editing.note||''):''}</textarea></div>
+    <button class="btn" onclick="saveBuyerEntry('${landId}','${buyerId}','${editing?editing.id:''}')">${editing?'ذخیره':'ثبت'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteBuyerEntry('${landId}','${buyerId}','${editing.id}')">حذف</button>`:''}
+  `);
+};
+window.setBeType=function(t){
+  document.getElementById('beType').value=t;
+  document.querySelectorAll('#beTypeSeg button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('#beTypeSeg .'+(t==='sale'?'on-a':'on-b')).classList.add('active');
+  document.getElementById('beSaleFields').style.display = t==='sale'?'block':'none';
+  document.getElementById('bePayFields').style.display = t==='payment'?'block':'none';
+};
+window.updateBeTotal=function(){
+  const w=parseFloat(document.getElementById('beWeight').value)||0;
+  const p=parseFloat(document.getElementById('beUnitPrice').value)||0;
+  document.getElementById('beTotalDisplay').textContent=fmt(w*p)+' ریال';
+};
+window.saveBuyerEntry=async function(landId,buyerId,editId){
+  const type=document.getElementById('beType').value;
+  const date=readJalaliPicker('beDate');
+  const note=document.getElementById('beNote').value.trim();
+  let data={type,date,note};
+  if(type==='sale'){
+    const cargoType=document.getElementById('beCargo').value.trim();
+    const qty=parseFloat(document.getElementById('beQty').value)||0;
+    const weight=parseFloat(document.getElementById('beWeight').value)||0;
+    const unitPrice=parseFloat(document.getElementById('beUnitPrice').value)||0;
+    const total=weight*unitPrice;
+    if(!cargoType){ toast('نوع بار را وارد کنید'); return; }
+    data={...data,cargoType,qty,weight,unitPrice,total};
+  } else {
+    const amount=parseFloat(document.getElementById('beAmount').value)||0;
+    data={...data,amount};
+  }
+  if(editId) await updD(entriesCol(landId,'buyers',buyerId),editId,data);
+  else await addD(entriesCol(landId,'buyers',buyerId),data);
+  await refreshBuyerEntries(landId,buyerId); closeSheet(); go({screen:'buyerDetail',landId,buyerId}); toast('ذخیره شد');
+};
+window.deleteBuyerEntry=async function(landId,buyerId,id){
+  await delD(entriesCol(landId,'buyers',buyerId),id);
+  await refreshBuyerEntries(landId,buyerId); closeSheet(); go({screen:'buyerDetail',landId,buyerId}); toast('حذف شد');
+};
+
+/* ================= WORKERS ================= */
+function workersScreen(){
+  return `
+    <div class="subtabs">
+      <button class="${workerTab==='individual'?'active':''}" onclick="workerTab='individual';render()">کارگر تکی</button>
+      <button class="${workerTab==='foreman'?'active':''}" onclick="workerTab='foreman';render()">سرکارگر</button>
+    </div>
+    ${workerTab==='individual'? individualListHTML() : foremanListHTML()}
+  `;
+}
+function individualListHTML(){
+  const list=CACHE.workers[NAV.landId]||[];
+  if(!list.length) return emptyHTML('کارگری ثبت نشده — با + اضافه کنید');
+  return list.map(w=>{
+    const logs=CACHE.workerLogs[w.id];
+    const sum = logs!==undefined ? workerWageSum(logs) : null;
+    return `<div class="row-item" onclick="openWorkerDetail('${NAV.landId}','${w.id}')">
+      <div class="row-badge b-gold">${ICONS.workers}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(w.name)}</div><div class="row-sub">روز کامل: ${fmt(w.fullRate)} · نصف: ${fmt(w.halfRate)} · اضافه‌کاری: ${fmt(w.otRate)}/ساعت</div></div>
+      <div class="row-end"><div class="row-amount pos">${sum===null?'...':fmt(sum)}</div><div class="row-date">جمع دستمزد</div></div>
+    </div>`;
+  }).join('');
+}
+function foremanListHTML(){
+  const list=CACHE.foremen[NAV.landId]||[];
+  if(!list.length) return emptyHTML('سرکارگری ثبت نشده — با + اضافه کنید');
+  return list.map(f=>{
+    const logs=CACHE.foremanLogs[f.id];
+    const sum = logs!==undefined? workerWageSum(logs) : null;
+    return `<div class="row-item" onclick="openForemanDetail('${NAV.landId}','${f.id}')">
+      <div class="row-badge b-gold">${ICONS.workers}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(f.name)}</div><div class="row-sub">مرد: ${fmt(f.mFullRate)} · زن: ${fmt(f.fFullRate)}</div></div>
+      <div class="row-end"><div class="row-amount pos">${sum===null?'...':fmt(sum)}</div><div class="row-date">جمع دستمزد</div></div>
+    </div>`;
+  }).join('');
+}
+window.openWorkerDetail=function(landId,workerId){ go({screen:'workerDetail',landId,workerId}); };
+window.openForemanDetail=function(landId,foremanId){ go({screen:'foremanDetail',landId,foremanId}); };
+
+window.openWorkerSheet=function(landId,editId){
+  const editing = editId ? (CACHE.workers[landId]||[]).find(w=>w.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش کارگر':'کارگر جدید'}</div>
+    <div class="field"><label>نام کارگر</label><input type="text" id="wName" value="${editing?escapeAttr(editing.name):''}"></div>
+    <div class="field"><label>شماره تماس (اختیاری)</label><input type="text" id="wPhone" value="${editing?escapeAttr(editing.phone||''):''}"></div>
+    <div class="grid2">
+      <div class="field"><label>نرخ روز کامل (ریال)</label><input type="number" id="wFull" value="${editing?editing.fullRate:''}"></div>
+      <div class="field"><label>نرخ نصف روز (ریال)</label><input type="number" id="wHalf" value="${editing?editing.halfRate:''}"></div>
+    </div>
+    <div class="field"><label>نرخ اضافه‌کاری (ریال به ازای هر ساعت)</label><input type="number" id="wOt" value="${editing?editing.otRate:''}"></div>
+    <button class="btn" onclick="saveWorker('${landId}','${editing?editing.id:''}')">${editing?'ذخیره':'افزودن'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteWorker('${landId}','${editing.id}')">حذف کارگر</button>`:''}
+  `);
+};
+window.saveWorker=async function(landId,editId){
+  const name=document.getElementById('wName').value.trim();
+  const phone=document.getElementById('wPhone').value.trim();
+  const fullRate=parseFloat(document.getElementById('wFull').value)||0;
+  const halfRate=parseFloat(document.getElementById('wHalf').value)||0;
+  const otRate=parseFloat(document.getElementById('wOt').value)||0;
+  if(!name){ toast('نام را وارد کنید'); return; }
+  const data={name,phone,fullRate,halfRate,otRate};
+  if(editId) await updD(subCol(landId,'workers'),editId,data);
+  else await addD(subCol(landId,'workers'),data);
+  await refreshWorkers(landId); closeSheet(); go({screen:'workers',landId}); toast('ذخیره شد');
+};
+window.deleteWorker=async function(landId,id){
+  await delD(subCol(landId,'workers'),id);
+  await refreshWorkers(landId); closeSheet(); go({screen:'workers',landId}); toast('حذف شد');
+};
+
+function workerDetailScreen(){
+  const w=(CACHE.workers[NAV.landId]||[]).find(x=>x.id===NAV.workerId);
+  const logs=(CACHE.workerLogs[NAV.workerId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const sum=workerWageSum(logs);
+  const fullCount=logs.filter(l=>l.type==='full').length;
+  const halfCount=logs.filter(l=>l.type==='half').length;
+  const otMin=logs.filter(l=>l.type==='ot').reduce((s,l)=>s+(l.otMinutes||0),0);
+  return `
+    <div class="rate-card">نرخ فعلی: روز کامل <b>${fmt(w.fullRate)}</b> · نصف روز <b>${fmt(w.halfRate)}</b> · اضافه‌کاری <b>${fmt(w.otRate)}</b>/ساعت &nbsp;
+      <span style="color:var(--accent);cursor:pointer;font-weight:700" onclick="openWorkerSheet('${NAV.landId}','${NAV.workerId}')">ویرایش نرخ</span></div>
+    <div class="totals-bar">
+      <div>جمع دستمزد<b>${fmt(sum)}</b></div>
+      <div>روز کامل<b>${fullCount}</b></div>
+      <div>نصف‌روز<b>${halfCount}</b></div>
+      <div>اضافه‌کاری<b>${(otMin/60).toFixed(1)}س</b></div>
+    </div>
+    <div class="quick-row" style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn" style="margin:0" onclick="addFullDay('${NAV.landId}','${NAV.workerId}')">+ روز کامل</button>
+      <button class="btn ghost" style="margin:0" onclick="addHalfDay('${NAV.landId}','${NAV.workerId}')">+ نصف روز</button>
+    </div>
+    <div class="quick-row" style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn ghost" style="margin:0" onclick="removeLastLog('${NAV.landId}','${NAV.workerId}','full')">- آخرین روز کامل</button>
+      <button class="btn ghost" style="margin:0" onclick="removeLastLog('${NAV.landId}','${NAV.workerId}','half')">- آخرین نصف‌روز</button>
+    </div>
+    <div class="quick-row" style="display:flex;gap:8px;margin-bottom:20px;">
+      <button class="btn secondary" style="margin:0" onclick="adjustOt('${NAV.landId}','${NAV.workerId}',30)">+ نیم‌ساعت اضافه‌کاری</button>
+      <button class="btn secondary" style="margin:0" onclick="adjustOt('${NAV.landId}','${NAV.workerId}',-30)">- نیم‌ساعت اضافه‌کاری</button>
+    </div>
+    <div class="section-title">لیست روزهای ثبت‌شده</div>
+    ${logs.length? logs.map(l=>workerLogRow(l)).join('') : emptyHTML('هنوز روزی ثبت نشده')}
+  `;
+}
+function workerLogRow(l){
+  let title = l.type==='full'?'روز کامل': l.type==='half'?'نصف روز':'اضافه‌کاری';
+  let sub = l.type==='ot' ? (l.otMinutes+' دقیقه') : '';
+  return `<div class="row-item" onclick="openWorkerLogSheet('${NAV.landId}','${NAV.workerId}','${l.id}')">
+    <div class="row-badge b-gold">${ICONS.workers}</div>
+    <div class="row-main"><div class="row-title">${title}</div><div class="row-sub">${sub}</div></div>
+    <div class="row-end"><div class="row-amount pos">${fmt(l.wage)}</div><div class="row-date">${faDateShort(l.date)}</div></div>
+  </div>`;
+}
+window.addFullDay=async function(landId,workerId){
+  const w=(CACHE.workers[landId]||[]).find(x=>x.id===workerId);
+  await addD(logsCol(landId,'workers',workerId), {type:'full', date:todayIso(), wage:w.fullRate});
+  await refreshWorkerLogs(landId,workerId); render(); toast('ثبت شد');
+};
+window.addHalfDay=async function(landId,workerId){
+  const w=(CACHE.workers[landId]||[]).find(x=>x.id===workerId);
+  await addD(logsCol(landId,'workers',workerId), {type:'half', date:todayIso(), wage:w.halfRate});
+  await refreshWorkerLogs(landId,workerId); render(); toast('ثبت شد');
+};
+window.removeLastLog=async function(landId,workerId,type){
+  const logs=(CACHE.workerLogs[workerId]||[]).filter(l=>l.type===type).sort((a,b)=>b.createdAt-a.createdAt);
+  if(!logs.length){ toast('رکوردی نیست'); return; }
+  await delD(logsCol(landId,'workers',workerId), logs[0].id);
+  await refreshWorkerLogs(landId,workerId); render(); toast('حذف شد');
+};
+window.adjustOt=async function(landId,workerId,deltaMin){
+  const w=(CACHE.workers[landId]||[]).find(x=>x.id===workerId);
+  const today=todayIso();
+  const logs=CACHE.workerLogs[workerId]||[];
+  let todayOt = logs.find(l=>l.type==='ot' && l.date===today);
+  if(!todayOt){
+    if(deltaMin<0){ toast('اضافه‌کاری امروز صفره'); return; }
+    const wage = w.otRate * (deltaMin/60);
+    await addD(logsCol(landId,'workers',workerId), {type:'ot', date:today, otMinutes:deltaMin, wage});
+  } else {
+    const newMin = Math.max(0, (todayOt.otMinutes||0)+deltaMin);
+    if(newMin===0){
+      await delD(logsCol(landId,'workers',workerId), todayOt.id);
+    } else {
+      const wage = w.otRate * (newMin/60);
+      await updD(logsCol(landId,'workers',workerId), todayOt.id, {otMinutes:newMin, wage});
+    }
+  }
+  await refreshWorkerLogs(landId,workerId); render(); toast('بروزرسانی شد');
+};
+window.openWorkerLogSheet=function(landId,workerId,editId){
+  const logs=CACHE.workerLogs[workerId]||[];
+  const editing = editId ? logs.find(l=>l.id===editId) : null;
+  if(!editing) return; // add handled via quick buttons
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">ویرایش رکورد</div>
+    <div class="field"><label>تاریخ</label>${jalaliPickerHTML('wlDate', editing.date)}</div>
+    <div class="field"><label>دستمزد (ریال)</label><input type="number" id="wlWage" value="${editing.wage}"></div>
+    ${editing.type==='ot'?`<div class="field"><label>مدت اضافه‌کاری (دقیقه)</label><input type="number" id="wlOtMin" value="${editing.otMinutes}"></div>`:''}
+    <button class="btn" onclick="saveWorkerLog('${landId}','${workerId}','${editing.id}','${editing.type}')">ذخیره</button>
+    <button class="btn secondary" style="margin-top:8px" onclick="deleteWorkerLog('${landId}','${workerId}','${editing.id}')">حذف</button>
+  `);
+};
+window.saveWorkerLog=async function(landId,workerId,id,type){
+  const date=readJalaliPicker('wlDate');
+  const wage=parseFloat(document.getElementById('wlWage').value)||0;
+  const data={date,wage};
+  if(type==='ot') data.otMinutes=parseFloat(document.getElementById('wlOtMin').value)||0;
+  await updD(logsCol(landId,'workers',workerId), id, data);
+  await refreshWorkerLogs(landId,workerId); closeSheet(); render(); toast('ذخیره شد');
+};
+window.deleteWorkerLog=async function(landId,workerId,id){
+  await delD(logsCol(landId,'workers',workerId), id);
+  await refreshWorkerLogs(landId,workerId); closeSheet(); render(); toast('حذف شد');
+};
+
+/* ---- Foreman ---- */
+window.openForemanSheet=function(landId,editId){
+  const editing = editId ? (CACHE.foremen[landId]||[]).find(f=>f.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش سرکارگر':'سرکارگر جدید'}</div>
+    <div class="field"><label>نام سرکارگر</label><input type="text" id="fName" value="${editing?escapeAttr(editing.name):''}"></div>
+    <div class="section-title" style="margin:14px 0 8px">نرخ مردها</div>
+    <div class="grid2">
+      <div class="field"><label>روز کامل (ریال)</label><input type="number" id="fMFull" value="${editing?editing.mFullRate:''}"></div>
+      <div class="field"><label>نصف روز (ریال)</label><input type="number" id="fMHalf" value="${editing?editing.mHalfRate:''}"></div>
+    </div>
+    <div class="field"><label>اضافه‌کاری مردها (ریال/ساعت)</label><input type="number" id="fMOt" value="${editing?editing.mOtRate:''}"></div>
+    <div class="section-title" style="margin:14px 0 8px">نرخ زن‌ها</div>
+    <div class="grid2">
+      <div class="field"><label>روز کامل (ریال)</label><input type="number" id="fFFull" value="${editing?editing.fFullRate:''}"></div>
+      <div class="field"><label>نصف روز (ریال)</label><input type="number" id="fFHalf" value="${editing?editing.fHalfRate:''}"></div>
+    </div>
+    <div class="field"><label>اضافه‌کاری زن‌ها (ریال/ساعت)</label><input type="number" id="fFOt" value="${editing?editing.fOtRate:''}"></div>
+    <button class="btn" onclick="saveForeman('${landId}','${editing?editing.id:''}')">${editing?'ذخیره':'افزودن'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteForeman('${landId}','${editing.id}')">حذف</button>`:''}
+  `);
+};
+window.saveForeman=async function(landId,editId){
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('نام را وارد کنید'); return; }
+  const data={
+    name,
+    mFullRate:parseFloat(document.getElementById('fMFull').value)||0,
+    mHalfRate:parseFloat(document.getElementById('fMHalf').value)||0,
+    mOtRate:parseFloat(document.getElementById('fMOt').value)||0,
+    fFullRate:parseFloat(document.getElementById('fFFull').value)||0,
+    fHalfRate:parseFloat(document.getElementById('fFHalf').value)||0,
+    fOtRate:parseFloat(document.getElementById('fFOt').value)||0,
+  };
+  if(editId) await updD(subCol(landId,'foremen'),editId,data);
+  else await addD(subCol(landId,'foremen'),data);
+  await refreshForemen(landId); closeSheet(); go({screen:'workers',landId}); toast('ذخیره شد');
+};
+window.deleteForeman=async function(landId,id){
+  await delD(subCol(landId,'foremen'),id);
+  await refreshForemen(landId); closeSheet(); go({screen:'workers',landId}); toast('حذف شد');
+};
+
+function foremanDetailScreen(){
+  const f=(CACHE.foremen[NAV.landId]||[]).find(x=>x.id===NAV.foremanId);
+  const logs=(CACHE.foremanLogs[NAV.foremanId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const sum=workerWageSum(logs);
+  return `
+    <div class="rate-card">
+      مرد: روز کامل <b>${fmt(f.mFullRate)}</b> · نصف <b>${fmt(f.mHalfRate)}</b> · اضافه‌کاری <b>${fmt(f.mOtRate)}</b>/س<br>
+      زن: روز کامل <b>${fmt(f.fFullRate)}</b> · نصف <b>${fmt(f.fHalfRate)}</b> · اضافه‌کاری <b>${fmt(f.fOtRate)}</b>/س
+      &nbsp; <span style="color:var(--accent);cursor:pointer;font-weight:700" onclick="openForemanSheet('${NAV.landId}','${NAV.foremanId}')">ویرایش نرخ</span>
+    </div>
+    <div class="totals-bar"><div>جمع کل دستمزد<b>${fmt(sum)} ریال</b></div></div>
+    <div class="section-title">روزهای ثبت‌شده</div>
+    ${logs.length? logs.map(l=>foremanLogRow(l)).join('') : emptyHTML('هنوز روزی ثبت نشده')}
+  `;
+}
+function foremanLogRow(l){
+  return `<div class="row-item" onclick="openForemanLogSheet('${NAV.landId}','${NAV.foremanId}','${l.id}')">
+    <div class="row-badge b-gold">${ICONS.workers}</div>
+    <div class="row-main"><div class="row-title">مرد ${fmt(l.mFull)}کامل/${fmt(l.mHalf)}نصف &nbsp; زن ${fmt(l.fFull)}کامل/${fmt(l.fHalf)}نصف</div>
+      <div class="row-sub">اضافه‌کاری: مرد ${l.mOtCount||0}نفر×${l.mOtHours||0}س، زن ${l.fOtCount||0}نفر×${l.fOtHours||0}س</div></div>
+    <div class="row-end"><div class="row-amount pos">${fmt(l.wage)}</div><div class="row-date">${faDateShort(l.date)}</div></div>
+  </div>`;
+}
+function computeForemanWage(f, mFull,mHalf,fFull,fHalf,mOtCount,mOtHours,fOtCount,fOtHours){
+  return mFull*f.mFullRate + mHalf*f.mHalfRate + fFull*f.fFullRate + fHalf*f.fHalfRate
+       + mOtCount*mOtHours*f.mOtRate + fOtCount*fOtHours*f.fOtRate;
+}
+window.openForemanLogSheet=function(landId,foremanId,editId){
+  const f=(CACHE.foremen[landId]||[]).find(x=>x.id===foremanId);
+  const logs=CACHE.foremanLogs[foremanId]||[];
+  const editing = editId ? logs.find(l=>l.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش روز':'ثبت روز جدید'}</div>
+    <div class="field"><label>تاریخ</label>${jalaliPickerHTML('flDate', editing?editing.date:todayIso())}</div>
+    <div class="section-title" style="margin:10px 0 8px">مردها</div>
+    <div class="grid2">
+      <div class="field"><label>تعداد روز کامل</label><input type="number" id="flMFull" value="${editing?editing.mFull:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+      <div class="field"><label>تعداد نصف روز</label><input type="number" id="flMHalf" value="${editing?editing.mHalf:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>تعداد نفرات اضافه‌کاری</label><input type="number" id="flMOtCount" value="${editing?editing.mOtCount:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+      <div class="field"><label>ساعت اضافه‌کاری (هر نفر)</label><input type="number" step="0.25" id="flMOtHours" value="${editing?editing.mOtHours:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+    </div>
+    <div class="section-title" style="margin:10px 0 8px">زن‌ها</div>
+    <div class="grid2">
+      <div class="field"><label>تعداد روز کامل</label><input type="number" id="flFFull" value="${editing?editing.fFull:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+      <div class="field"><label>تعداد نصف روز</label><input type="number" id="flFHalf" value="${editing?editing.fHalf:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>تعداد نفرات اضافه‌کاری</label><input type="number" id="flFOtCount" value="${editing?editing.fOtCount:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+      <div class="field"><label>ساعت اضافه‌کاری (هر نفر)</label><input type="number" step="0.25" id="flFOtHours" value="${editing?editing.fOtHours:'0'}" oninput="updateForemanTotal('${foremanId}')"></div>
+    </div>
+    <div class="computed-total"><span>جمع کل دستمزد</span><span id="flTotalDisplay">${editing?fmt(editing.wage):'0'} ریال</span></div>
+    <button class="btn" onclick="saveForemanLog('${landId}','${foremanId}','${editing?editing.id:''}')">${editing?'ذخیره':'ثبت'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteForemanLog('${landId}','${foremanId}','${editing.id}')">حذف</button>`:''}
+  `);
+  window._foremanForTotal = f;
+};
+window.updateForemanTotal=function(foremanId){
+  const f=window._foremanForTotal;
+  const mFull=parseFloat(document.getElementById('flMFull').value)||0;
+  const mHalf=parseFloat(document.getElementById('flMHalf').value)||0;
+  const fFull=parseFloat(document.getElementById('flFFull').value)||0;
+  const fHalf=parseFloat(document.getElementById('flFHalf').value)||0;
+  const mOtCount=parseFloat(document.getElementById('flMOtCount').value)||0;
+  const mOtHours=parseFloat(document.getElementById('flMOtHours').value)||0;
+  const fOtCount=parseFloat(document.getElementById('flFOtCount').value)||0;
+  const fOtHours=parseFloat(document.getElementById('flFOtHours').value)||0;
+  const total=computeForemanWage(f,mFull,mHalf,fFull,fHalf,mOtCount,mOtHours,fOtCount,fOtHours);
+  document.getElementById('flTotalDisplay').textContent=fmt(total)+' ریال';
+};
+window.saveForemanLog=async function(landId,foremanId,editId){
+  const f=(CACHE.foremen[landId]||[]).find(x=>x.id===foremanId);
+  const date=readJalaliPicker('flDate');
+  const mFull=parseFloat(document.getElementById('flMFull').value)||0;
+  const mHalf=parseFloat(document.getElementById('flMHalf').value)||0;
+  const fFull=parseFloat(document.getElementById('flFFull').value)||0;
+  const fHalf=parseFloat(document.getElementById('flFHalf').value)||0;
+  const mOtCount=parseFloat(document.getElementById('flMOtCount').value)||0;
+  const mOtHours=parseFloat(document.getElementById('flMOtHours').value)||0;
+  const fOtCount=parseFloat(document.getElementById('flFOtCount').value)||0;
+  const fOtHours=parseFloat(document.getElementById('flFOtHours').value)||0;
+  const wage=computeForemanWage(f,mFull,mHalf,fFull,fHalf,mOtCount,mOtHours,fOtCount,fOtHours);
+  const data={date,mFull,mHalf,fFull,fHalf,mOtCount,mOtHours,fOtCount,fOtHours,wage};
+  if(editId) await updD(logsCol(landId,'foremen',foremanId),editId,data);
+  else await addD(logsCol(landId,'foremen',foremanId),data);
+  await refreshForemanLogs(landId,foremanId); closeSheet(); render(); toast('ذخیره شد');
+};
+window.deleteForemanLog=async function(landId,foremanId,id){
+  await delD(logsCol(landId,'foremen',foremanId),id);
+  await refreshForemanLogs(landId,foremanId); closeSheet(); render(); toast('حذف شد');
+};
+
+/* ================= OPERATIONS ================= */
+function operationsScreen(){
+  const list=(CACHE.operations[NAV.landId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  return list.length? list.map(o=>`
+    <div class="row-item" onclick="openOperationSheet('${NAV.landId}','${o.id}')">
+      <div class="row-badge b-gold">${ICONS.ops}</div>
+      <div class="row-main"><div class="row-title">${escapeHtml(o.opType)}</div><div class="row-sub">${escapeHtml(o.desc||'')}</div></div>
+      <div class="row-end"><div class="row-date">${faDateLabel(o.date)}</div></div>
+    </div>
+  `).join('') : emptyHTML('عملیاتی ثبت نشده — با + اضافه کنید');
+}
+window.openOperationSheet=function(landId,editId){
+  const list=CACHE.operations[landId]||[];
+  const editing = editId ? list.find(o=>o.id===editId) : null;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">${editing?'ویرایش عملیات':'ثبت عملیات'}</div>
+    <div class="field"><label>تاریخ انجام عملیات</label>${jalaliPickerHTML('opDate', editing?editing.date:todayIso())}</div>
+    <div class="field"><label>نوع عملیات</label>
+      <select id="opType">
+        ${['آبدهی','محلول‌پاشی','کوددهی','برداشت','سایر'].map(t=>`<option ${editing&&editing.opType===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>توضیحات</label><textarea id="opDesc" placeholder="مثلاً آبدهی همراه با کود">${editing?escapeHtml(editing.desc||''):''}</textarea></div>
+    <button class="btn" onclick="saveOperation('${landId}','${editing?editing.id:''}')">${editing?'ذخیره':'ثبت'}</button>
+    ${editing?`<button class="btn secondary" style="margin-top:8px" onclick="deleteOperation('${landId}','${editing.id}')">حذف</button>`:''}
+  `);
+};
+window.saveOperation=async function(landId,editId){
+  const date=readJalaliPicker('opDate');
+  const opType=document.getElementById('opType').value;
+  const desc=document.getElementById('opDesc').value.trim();
+  const data={date,opType,desc};
+  if(editId) await updD(subCol(landId,'operations'),editId,data);
+  else await addD(subCol(landId,'operations'),data);
+  await refreshOperations(landId); closeSheet(); go({screen:'operations',landId}); toast('ذخیره شد');
+};
+window.deleteOperation=async function(landId,id){
+  await delD(subCol(landId,'operations'),id);
+  await refreshOperations(landId); closeSheet(); go({screen:'operations',landId}); toast('حذف شد');
+};
+
+/* ================= LAND AUDIT ================= */
+async function computeLandTotals(landId){
+  const vendors = CACHE.vendors[landId] || await (async()=>{const v=await listDocs(subCol(landId,'vendors'));CACHE.vendors[landId]=v;return v;})();
+  const buyers = CACHE.buyers[landId] || await (async()=>{const b=await listDocs(subCol(landId,'buyers'));CACHE.buyers[landId]=b;return b;})();
+  const workers = CACHE.workers[landId] || await (async()=>{const w=await listDocs(subCol(landId,'workers'));CACHE.workers[landId]=w;return w;})();
+  const foremen = CACHE.foremen[landId] || await (async()=>{const f=await listDocs(subCol(landId,'foremen'));CACHE.foremen[landId]=f;return f;})();
+
+  let totalPurchased=0, totalPaidToVendors=0, debt=0;
+  const vendorBreak=[];
+  for(const v of vendors){
+    const entries = CACHE.vendorEntries[v.id] || await (async()=>{const e=await listDocs(entriesCol(landId,'vendors',v.id));CACHE.vendorEntries[v.id]=e;return e;})();
+    let purchased=0, paid=0;
+    entries.forEach(e=>{ if(e.type==='purchase') purchased+=(e.amount||0); else paid+=(e.amount||0); });
+    totalPurchased+=purchased; totalPaidToVendors+=paid;
+    const bal=purchased-paid;
+    if(bal>0) debt+=bal;
+    vendorBreak.push({name:v.name, balance:bal});
+  }
+  let totalSales=0, totalReceivedFromBuyers=0, receivable=0;
+  const buyerBreak=[];
+  for(const b of buyers){
+    const entries = CACHE.buyerEntries[b.id] || await (async()=>{const e=await listDocs(entriesCol(landId,'buyers',b.id));CACHE.buyerEntries[b.id]=e;return e;})();
+    let sold=0, paid=0;
+    entries.forEach(e=>{ if(e.type==='sale') sold+=(e.total||0); else paid+=(e.amount||0); });
+    totalSales+=sold; totalReceivedFromBuyers+=paid;
+    const bal=sold-paid;
+    if(bal>0) receivable+=bal;
+    buyerBreak.push({name:b.name, balance:bal});
+  }
+  let totalWages=0;
+  for(const w of workers){
+    const logs = CACHE.workerLogs[w.id] || await (async()=>{const l=await listDocs(logsCol(landId,'workers',w.id));CACHE.workerLogs[w.id]=l;return l;})();
+    totalWages += workerWageSum(logs);
+  }
+  for(const f of foremen){
+    const logs = CACHE.foremanLogs[f.id] || await (async()=>{const l=await listDocs(logsCol(landId,'foremen',f.id));CACHE.foremanLogs[f.id]=l;return l;})();
+    totalWages += workerWageSum(logs);
+  }
+  const totalExpenses = totalPurchased + totalWages;
+  const profit = totalSales - totalExpenses;
+  return {totalPurchased,totalWages,totalExpenses,totalSales,profit,debt,receivable,vendorBreak,buyerBreak};
+}
+
+let LAND_AUDIT_CACHE = {};
+function landAuditScreen(){
+  const landId=NAV.landId;
+  if(!LAND_AUDIT_CACHE[landId]){
+    computeLandTotals(landId).then(t=>{ LAND_AUDIT_CACHE[landId]=t; if(NAV.screen==='landAudit'&&NAV.landId===landId) render(); });
+    return emptyHTML('در حال محاسبه...');
+  }
+  const t=LAND_AUDIT_CACHE[landId];
+  const profitPositive = t.profit>=0;
+  return `
+    <div class="stat-row">
+      <div class="stat income"><div class="lbl">فروش کل</div><div class="val">${fmt(t.totalSales)}</div></div>
+      <div class="stat expense"><div class="lbl">هزینه کل</div><div class="val">${fmt(t.totalExpenses)}</div></div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat"><div class="lbl">خرید از فروشنده‌ها</div><div class="val">${fmt(t.totalPurchased)}</div></div>
+      <div class="stat"><div class="lbl">دستمزد کارگر</div><div class="val">${fmt(t.totalWages)}</div></div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat"><div class="lbl">بدهی به فروشنده‌ها</div><div class="val" style="color:var(--rust)">${fmt(t.debt)}</div></div>
+      <div class="stat"><div class="lbl">طلب از خریداران</div><div class="val" style="color:var(--primary)">${fmt(t.receivable)}</div></div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat profit" style="flex:1"><div class="lbl">${profitPositive?'سود خالص':'زیان'}</div><div class="val">${fmt(Math.abs(t.profit))}</div></div>
+    </div>
+    <button class="btn ghost" style="margin-top:16px" onclick="refreshLandAudit('${landId}')">بروزرسانی محاسبه</button>
+
+    <div class="section-title">بدهی به فروشنده‌ها</div>
+    ${t.vendorBreak.filter(v=>v.balance!==0).length? t.vendorBreak.filter(v=>v.balance!==0).map(v=>`
+      <div class="bar-row"><div class="bar-lbl"><span>${escapeHtml(v.name)}</span><b style="color:${v.balance>0?'var(--rust)':'var(--primary)'}">${fmt(v.balance)}</b></div></div>
+    `).join('') : emptyHTML('بدهی باز نیست')}
+
+    <div class="section-title">طلب از خریداران</div>
+    ${t.buyerBreak.filter(b=>b.balance!==0).length? t.buyerBreak.filter(b=>b.balance!==0).map(b=>`
+      <div class="bar-row"><div class="bar-lbl"><span>${escapeHtml(b.name)}</span><b style="color:${b.balance>0?'var(--primary)':'var(--rust)'}">${fmt(b.balance)}</b></div></div>
+    `).join('') : emptyHTML('طلبی باز نیست')}
+  `;
+}
+window.refreshLandAudit=function(landId){ delete LAND_AUDIT_CACHE[landId]; render(); };
+
+/* ================= GLOBAL AUDIT ================= */
+let GLOBAL_AUDIT_CACHE = null;
+function globalAuditScreen(){
+  if(!GLOBAL_AUDIT_CACHE){
+    (async()=>{
+      const perLand=[];
+      for(const l of CACHE.lands){ perLand.push({land:l, totals: await computeLandTotals(l.id)}); }
+      GLOBAL_AUDIT_CACHE = perLand;
+      if(NAV.screen==='globalAudit') render();
+    })();
+    return emptyHTML('در حال محاسبه همه زمین‌ها...');
+  }
+  const perLand=GLOBAL_AUDIT_CACHE;
+  const sum=(key)=>perLand.reduce((s,p)=>s+p.totals[key],0);
+  const totalSales=sum('totalSales'), totalExpenses=sum('totalExpenses'), profit=sum('profit'), debt=sum('debt'), receivable=sum('receivable');
+
+  // group by name across lands
+  const vendorGroups={}, buyerGroups={};
+  perLand.forEach(p=>{
+    p.totals.vendorBreak.forEach(v=>{
+      if(v.balance===0) return;
+      const key=v.name.trim();
+      vendorGroups[key]=vendorGroups[key]||{name:key,total:0,byLand:[]};
+      vendorGroups[key].total+=v.balance;
+      vendorGroups[key].byLand.push({land:p.land.name, balance:v.balance});
+    });
+    p.totals.buyerBreak.forEach(b=>{
+      if(b.balance===0) return;
+      const key=b.name.trim();
+      buyerGroups[key]=buyerGroups[key]||{name:key,total:0,byLand:[]};
+      buyerGroups[key].total+=b.balance;
+      buyerGroups[key].byLand.push({land:p.land.name, balance:b.balance});
+    });
+  });
+
+  return `
+    <div class="stat-row">
+      <div class="stat income"><div class="lbl">جمع فروش همه زمین‌ها</div><div class="val">${fmt(totalSales)}</div></div>
+      <div class="stat expense"><div class="lbl">جمع هزینه همه زمین‌ها</div><div class="val">${fmt(totalExpenses)}</div></div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat"><div class="lbl">بدهی کل</div><div class="val" style="color:var(--rust)">${fmt(debt)}</div></div>
+      <div class="stat"><div class="lbl">طلب کل</div><div class="val" style="color:var(--primary)">${fmt(receivable)}</div></div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat profit"><div class="lbl">${profit>=0?'سود خالص کل':'زیان کل'}</div><div class="val">${fmt(Math.abs(profit))}</div></div>
+    </div>
+    <button class="btn ghost" style="margin-top:16px" onclick="refreshGlobalAudit()">بروزرسانی محاسبه</button>
+
+    <div class="section-title">سود/زیان به تفکیک هر زمین</div>
+    ${perLand.map(p=>`
+      <div class="row-item" style="cursor:default">
+        <div class="row-badge b-green">${ICONS.land}</div>
+        <div class="row-main"><div class="row-title">${escapeHtml(p.land.name)}</div><div class="row-sub">فروش: ${fmt(p.totals.totalSales)} · هزینه: ${fmt(p.totals.totalExpenses)}</div></div>
+        <div class="row-end"><div class="row-amount ${p.totals.profit>=0?'pos':'neg'}">${fmt(p.totals.profit)}</div></div>
+      </div>
+    `).join('')}
+
+    <div class="section-title">بدهی به هر فروشنده (تفکیک زمین)</div>
+    ${Object.values(vendorGroups).length? Object.values(vendorGroups).map(g=>`
+      <div class="card" style="margin-bottom:9px;">
+        <div class="bar-lbl" style="display:flex;justify-content:space-between;font-weight:700;"><span>${escapeHtml(g.name)}</span><span style="color:${g.total>0?'var(--rust)':'var(--primary)'}">${fmt(g.total)}</span></div>
+        ${g.byLand.map(x=>`<div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">${escapeHtml(x.land)}: ${fmt(x.balance)}</div>`).join('')}
+      </div>
+    `).join('') : emptyHTML('بدهی باز نیست')}
+
+    <div class="section-title">طلب از هر خریدار (تفکیک زمین)</div>
+    ${Object.values(buyerGroups).length? Object.values(buyerGroups).map(g=>`
+      <div class="card" style="margin-bottom:9px;">
+        <div class="bar-lbl" style="display:flex;justify-content:space-between;font-weight:700;"><span>${escapeHtml(g.name)}</span><span style="color:${g.total>0?'var(--primary)':'var(--rust)'}">${fmt(g.total)}</span></div>
+        ${g.byLand.map(x=>`<div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">${escapeHtml(x.land)}: ${fmt(x.balance)}</div>`).join('')}
+      </div>
+    `).join('') : emptyHTML('طلبی باز نیست')}
+  `;
+}
+window.refreshGlobalAudit=function(){ GLOBAL_AUDIT_CACHE=null; render(); };
+
+/* ================= SHEET ================= */
+function openSheet(html){
+  document.getElementById('sheet').innerHTML=html;
+  document.getElementById('overlay').classList.add('open');
+}
+window.closeSheet=function(){ document.getElementById('overlay').classList.remove('open'); };
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeSheet(); });
+
+/* Expose functions needed inline */
+window.go=go;
+</script>
+</body>
+</html>
